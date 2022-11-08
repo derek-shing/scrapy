@@ -39,15 +39,32 @@ class LoginSpider(scrapy.Spider):
 
         print(response.xpath("//h1[@class='ipsType_pageTitle']/text()").get())
         i=0
+        list = response.xpath("//ol[@class='ipsDataList ipsDataList_zebra ipsClear cForumTopicTable  cTopicList ']")
+        links = list.xpath(".//h4/a/@href")
+
+        """
         for trade in response.xpath("//span[@itemprop='name headline']"):
             trade_name = trade.xpath("normalize-space(.//text())").get()
             i+=1
             #print(i,' : ',trade_name)
             yield{"trade": trade_name}
+        """
+
+        for link in links:
+            #yield{"link":link.get()}
+            yield response.follow(url=link, callback=self.parse_trade)
 
         next = response.xpath("(//a[@rel='next'])[1]/@href").get()
-        if (next):
-            yield scrapy.Request(url = next, callback = self.scrap_post)
+        #if (next):
+            #yield scrapy.Request(url = next, callback = self.scrap_post)
 
             #response.xpath("//div[@class='col-md-8']/h1/a/text()")
             #test
+
+    def parse_trade(self, response):
+        articles = response.xpath("//article")
+        for article  in articles:
+            content = article.xpath("normalize-space(.//div[@class = 'cPost_contentWrap ipsPad']/descendant-or-self::*/text())").getall()
+            final_txt = ''.join( _ for _ in content).strip()
+            yield{"trade post": final_txt}
+            #scrap all post text
