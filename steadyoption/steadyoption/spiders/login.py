@@ -50,21 +50,43 @@ class LoginSpider(scrapy.Spider):
             yield{"trade": trade_name}
         """
 
+
+
         for link in links:
             #yield{"link":link.get()}
             yield response.follow(url=link, callback=self.parse_trade)
 
+
+
+        #link = links[0].get()
+        #yield response.follow(url=link, callback=self.parse_trade)
+
         next = response.xpath("(//a[@rel='next'])[1]/@href").get()
-        #if (next):
-            #yield scrapy.Request(url = next, callback = self.scrap_post)
+        if (next):
+            yield scrapy.Request(url = next, callback = self.scrap_post)
 
             #response.xpath("//div[@class='col-md-8']/h1/a/text()")
             #test
 
     def parse_trade(self, response):
         articles = response.xpath("//article")
+        trade_name = response.xpath("//span[@class='ipsType_break ipsContained']/span/text()").get()
+        trade_posts=[]
         for article  in articles:
-            content = article.xpath("normalize-space(.//div[@class = 'cPost_contentWrap ipsPad']/descendant-or-self::*/text())").getall()
-            final_txt = ''.join( _ for _ in content).strip()
-            yield{"trade post": final_txt}
+            contents = article.xpath(".//div[@class = 'cPost_contentWrap ipsPad']/descendant-or-self::*/text()").getall()
+            #final_txt = ''.join( _ for _ in content).strip()
+            final_txt =[]
+            for content in contents:
+                #_ =content.xpath("normalize-space(.//text())")
+                if (content.strip()):
+                    final_txt.append(content.strip())
+                #yield{"trade post": content.strip()}
+            #yield{"trade post": " ".join(final_txt)}
+            trade_posts.append(" ".join(final_txt))
+
             #scrap all post text
+        yield{
+            "Trade Name" : trade_name,
+            "Trade post": trade_posts
+        }
+            #print(str(contents))
