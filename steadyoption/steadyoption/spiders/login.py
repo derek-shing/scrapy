@@ -79,7 +79,7 @@ class LoginSpider(scrapy.Spider):
             for content in contents:
                 #_ =content.xpath("normalize-space(.//text())")
                 if (content.strip()):
-                    final_txt.append(content.strip())
+                    final_txt.append(content.strip().replace("&nbsp;", " "))
                 #yield{"trade post": content.strip()}
             #yield{"trade post": " ".join(final_txt)}
             trade_posts.append(" ".join(final_txt))

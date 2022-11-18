@@ -13,6 +13,14 @@ class QuoteSpider(scrapy.Spider):
             author = quote.xpath('.//*[@class="author"]/text()').extract_first()
             tag = quote.xpath('.//*[@class="tag"]/text()').extract()
 
+            next_url = response.xpath('.//*[@class="next"]/a/@href').extract_first()
+            url = response.urljoin(next_url)
+            yield scrapy.Request(url)
+
+
+            
+            yield{'Text':text, 'Author':author,'tag':tag}
+
             print('\n')
             print(text)
             print(author)
