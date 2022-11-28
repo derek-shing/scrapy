@@ -84,6 +84,8 @@ if (trade_detail):
 #print("Error")
 #print(error_list)
 
+print("I closed GM straddles. Sell to close 5  GM  Oct.28   34.5  put Sell to close 5  GM  Oct.28   34.5  call Price:  $2.47  credit per straddle, Gain +10.27% Earnings date:   Tuesday, October 25   Before Open Stock price:  $35.75 The number of contracts is per 10k portfolio and represents the closest number of contracts for 10% allocation. Please see more details in the discussion topic. Scroll down to the bottom of the page to see links to the last ten topics tagged with the same symbol. You need to follow this topic to get adjustment and close alerts. Please read about ﻿ our straddle strategy here . ﻿ ﻿ Disclaimer : I am not a Financial ﻿ Adviser and this is NOT trade recommendation. Please do your own homework and set your own entry and exit targets. 1 1 Pascal and ParadigmAU reacted to this Thanks Haha Upvote Downvote Like ×".lower())
+
 '''
 f = open('post.json', encoding="utf-8")
 

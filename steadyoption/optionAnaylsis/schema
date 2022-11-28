@@ -1,0 +1,59 @@
+[
+    {
+        "name": "Profit",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "Price",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "EarningDay",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "Trade",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "Type",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "Symbol",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "Date",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "Number",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "Strike",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            },
+            {
+                "name": "Action",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+        ]
+    },
+    {
+        "name": "Name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    }
+]
