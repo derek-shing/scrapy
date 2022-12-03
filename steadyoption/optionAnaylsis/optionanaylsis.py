@@ -37,7 +37,7 @@ def extract_earningday(post):
 #!/usr/bin/env python
 #coding=utf-8
 
-f = open('post.json', encoding="utf-8")
+f = open('post2.json', encoding="utf-8")
 
 data = json.load(f)
 print(len(data))
@@ -108,13 +108,16 @@ Error =[]
 
 for trade in data:
     name = trade['Trade Name']
-    post = trade['Trade post']
+    articles = trade['Trade post']
     if "(TRADES)" in name:
-        for article in post:
+        for article in articles:
+            writer = article['Writer']
+            postdateorg = article['Date']
+            postdate = re.search('\d\d/\d\d/\d\d\d\d',postdateorg)[0]
             trade_list=[]
             error_list=[]
             trade_pattern = "(Buy to open|Buy to close|Sell to close|Sell to open)(.*?)(call|put)"
-            strdecode = article.encode('ascii', errors='replace').decode().replace("?", " ")
+            strdecode = article['Post'].encode('ascii', errors='replace').decode().replace("?", " ")
             #strdecode= re.sub(r'[^\x00-\x7f]', " ", article)
             trade_detail = re.findall(trade_pattern,strdecode)
             if (trade_detail):
@@ -129,11 +132,11 @@ for trade in data:
                         #(action,number,stock_symbol[0].upper().strip(),date[0].strip(),strike[0].strip(),option_type)
                         trade_breakdown.append(tradeobject)
                 #trade_list.append(trade_breakdown)
-                error_list.append(error_breakdown)
+                #error_list.append(error_breakdown)
                 price = extract_price(strdecode.lower())
                 earning_day = extract_earningday(strdecode.lower())
                 pl = extract_PL(strdecode.lower())
-                temp = {'Name': name,'Trade':trade_breakdown, 'EarningDay':earning_day,'Price':price,'Profit':pl}
+                temp = {'Name': name,'Trade':trade_breakdown, 'EarningDay':earning_day,'Price':price,'Profit':pl,'Writer':writer,'PostingDay':postdate}
                 history.append(temp)
                 if len(error_list)>0:
                     temp2 ={'Trade Name':name, 'Error_parse':error_list}
@@ -146,7 +149,7 @@ with open('error2.json', 'w',encoding="utf-8") as file:
 
 file.close()
 
-with open('data2.json', 'w',encoding="utf-8") as file2:
+with open('data3.json', 'w',encoding="utf-8") as file2:
     for entry in history:
         json.dump(entry, file2)
         file2.write('\n')
