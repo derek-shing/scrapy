@@ -8,29 +8,36 @@ test = {"Trade Name": "(TRADES) GM October 2022 Straddle",
 
 
 def extract_price(post):
-    pattern="price:\s+\$(\d+\.?\d*)\s+(credit|debit)"
+    pattern="price:\s+\$(\d*\.?\d*)\s+(credit|debit)"
     price = re.search(pattern , post)
     if price:
         return (price.group(1))
     else:
-        return ("Error in Price")
+        return (None)
+
+def testisprofit(post,startposition, endposition):
+    targetrange = post[startposition-10:endposition +10]
+    if ("profit" in targetrange or "gain" in targetrange or "loss" in targetrange):
+        return True
+    else:
+        return False
 
 def extract_PL(post):
-    pattern ="(\+|-)\d+\.?\d*%"
+    pattern ="(\+|-)?\d+\.?\d*%"
     pl = re.search(pattern, post)
-    if pl:
+    if pl and testisprofit(post,pl.start(),pl.end()):
         return pl[0]
     else:
-        return ("Error in PL")
+        return (None)
 
 def extract_earningday(post):
 
-    pattern = "(earnings date:.*)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+(\d+)(\s+\d\d\d\d)?"
+    pattern = "(earnings date:.*)(jan|feb|mar|apr|arp|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+(\d+)(\s+\d\d\d\d)?"
     day = re.search(pattern, post)
     if (day):
         return (day.group(2)+day.group(3))
     else:
-        return ("Error in Earning Day")
+        return (None)
 
 
 
@@ -58,7 +65,7 @@ def extract_trade_info(trade):
   else:
       target =target[:strike.start()]
 
-  Day_pattern ="(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)(.+)\d+(s+\d\d\d\d)?"
+  Day_pattern ="(jan|feb|mar|apr|arp|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)(.+)\d+(s+\d\d\d\d)?"
 
   #print(reminding)
   date = re.search(Day_pattern,target)
@@ -89,7 +96,7 @@ def extract_trade_info(trade):
   if (number) and (stock_symbol) and (date) and (strike):
     return(action,number,stock_symbol[0].upper().strip(),date[0].strip(),strike[0].strip(),option_type)
   else:
-      return("Error in Trade")
+      return("Error",message)
 
 
 
@@ -116,10 +123,11 @@ for trade in data:
             postdate = re.search('\d\d/\d\d/\d\d\d\d',postdateorg)[0]
             trade_list=[]
             error_list=[]
-            trade_pattern = "(Buy to open|Buy to close|Sell to close|Sell to open)(.*?)(call|put)"
+            trade_pattern = "(buy to open|buy to close|sell to close|sell to open)(.*?)(call|put)"
             strdecode = article['Post'].encode('ascii', errors='replace').decode().replace("?", " ")
             #strdecode= re.sub(r'[^\x00-\x7f]', " ", article)
-            trade_detail = re.findall(trade_pattern,strdecode)
+            openclose=''
+            trade_detail = re.findall(trade_pattern,strdecode.lower())
             if (trade_detail):
                 trade_breakdown=[]
                 error_breakdown=[]
@@ -131,12 +139,16 @@ for trade in data:
                         tradeobject={"Action":result[0],"Number":result[1],"Symbol":result[2],"Date":result[3],"Strike":result[4],"Type":result[5]}
                         #(action,number,stock_symbol[0].upper().strip(),date[0].strip(),strike[0].strip(),option_type)
                         trade_breakdown.append(tradeobject)
+                        if 'open' in result[0]:
+                            openclose = 'open'
+                        elif 'close' in result[0]:
+                            openclose ='close'
                 #trade_list.append(trade_breakdown)
                 #error_list.append(error_breakdown)
                 price = extract_price(strdecode.lower())
                 earning_day = extract_earningday(strdecode.lower())
                 pl = extract_PL(strdecode.lower())
-                temp = {'Name': name,'Trade':trade_breakdown, 'EarningDay':earning_day,'Price':price,'Profit':pl,'Writer':writer,'PostingDay':postdate}
+                temp = {'Name': name,'Trade':trade_breakdown,'OpenClose':openclose, 'EarningDay':earning_day,'Price':price,'Profit':pl,'Writer':writer,'PostingDay':postdate,'Original':strdecode}
                 history.append(temp)
                 if len(error_list)>0:
                     temp2 ={'Trade Name':name, 'Error_parse':error_list}
