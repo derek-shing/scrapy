@@ -76,13 +76,15 @@ class LoginSpider(scrapy.Spider):
             contents = article.xpath(".//div[@class = 'cPost_contentWrap ipsPad']/descendant-or-self::*/text()").getall()
             #final_txt = ''.join( _ for _ in content).strip()
             final_txt =[]
+            writer = article.xpath(".//a[@class='ipsType_break']/span/text()").get()
+            date = article.xpath(".//time/@title").get()
             for content in contents:
                 #_ =content.xpath("normalize-space(.//text())")
                 if (content.strip()):
                     final_txt.append(content.strip().replace("&nbsp;", " "))
                 #yield{"trade post": content.strip()}
             #yield{"trade post": " ".join(final_txt)}
-            trade_posts.append(" ".join(final_txt))
+            trade_posts.append({"Writer":writer,"Date":date,"Post":" ".join(final_txt)})
 
             #scrap all post text
         yield{
